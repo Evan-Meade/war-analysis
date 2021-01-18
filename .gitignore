@@ -1,0 +1,11 @@
+# Ignore Python 3 virtual environment
+.venv/
+
+# Ignore IPython checkpoints
+.ipynb_checkpoints/
+
+# Ignore pycache
+__pycache__/
+
+# Ignore data (too large to upload)
+*.csv
