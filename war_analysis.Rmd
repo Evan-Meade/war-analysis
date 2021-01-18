@@ -13,8 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(ggplot2)
-games <- read.csv("war_game_data.csv")
-turns <- read.csv("war_turn_data.csv")
+games <- read.csv("normal_war_game_data.csv")
+turns <- read.csv("normal_war_turn_data.csv")
 ```
 
 ## Introductory Plots
