@@ -15,6 +15,7 @@ PREFIX = sys.argv[5]
 print(f'Simulating {NUM} games with {SUITS} suits, {VALUES} values, and {TIE} unflipped cards per tie...')
 
 def simulate(n, s, v, t):
+    print(f'Process started...{n}')
     wg = WarGame(s, v, t)
     war_game_data = pd.DataFrame()
     war_turn_data = pd.DataFrame()
@@ -29,8 +30,12 @@ def simulate(n, s, v, t):
         
         war_turn_data = pd.concat([war_turn_data, wg.turn_data])
     
+    print('Process complete.')
     return war_game_data, war_turn_data
 #     return True
+
+def sim_lambda(params):
+    return simulate(*params)
 
 master_game_data = pd.DataFrame()
 master_turn_data = pd.DataFrame()
@@ -39,18 +44,22 @@ N_CPU = os.cpu_count()
 nums = [NUM // N_CPU] * N_CPU
 for i in range(NUM % N_CPU):
     nums[i] += 1
-params = [[nums[i], SUITS, VALUES, TIE] for i in range(N_CPU)]
+params = ((nums[i], SUITS, VALUES, TIE) for i in range(N_CPU))
+
+start = time.time()
 
 with concurrent.futures.ProcessPoolExecutor() as executor:
 #     results = [executor.submit(simulate, params[i]) for i in range(N_CPU)]
 #     for result in concurrent.futures.as_completed(results):
 #         print(result)
-    results = executor.map(simulate, params)
+    results = executor.map(sim_lambda, params)
     for result in results:
         master_game_data = pd.concat([master_game_data, result[0]])
         master_turn_data = pd.concat([master_turn_data, result[1]])
 
-master_game_data.to_csv(f'{prefix}_game_data.csv', index=False)
-master_turn_data.to_csv(f'{prefix}_turn_data.csv', index=False)
+stop = time.time()
 
-print(f'Simulated {n} games in {stop - start} seconds')
+master_game_data.to_csv(f'{PREFIX}_game_data.csv', index=False)
+master_turn_data.to_csv(f'{PREFIX}_turn_data.csv', index=False)
+
+print(f'Simulated {NUM} games in {stop - start} seconds')
